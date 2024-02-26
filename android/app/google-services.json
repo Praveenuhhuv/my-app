@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "178388385662",
+    "project_id": "picblockchain",
+    "storage_bucket": "picblockchain.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:178388385662:android:87aba6d51fd9bf464cbd2f",
+        "android_client_info": {
+          "package_name": "com.example.pbc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "178388385662-9i0p9b3h7s2ooffa4ccnnkpe69r9kuvs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pbc",
+            "certificate_hash": "0119314d28ba5aa15844299e45bd8ee0c269460d"
+          }
+        },
+        {
+          "client_id": "178388385662-5g22ohc1t9pg7emar6l8rrpanb6e8ae8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDY1a5ccVK1WZxpn9AJKgSy3Rf9XJaJEMA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "178388385662-5g22ohc1t9pg7emar6l8rrpanb6e8ae8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "178388385662-k1i518nnuf4thlf5pq6q71cnvhvmq9qc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pbc"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
