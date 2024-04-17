@@ -1,10 +1,9 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:pbc/helper/dialogs.dart';
+import 'package:PicBlockChain/helper/dialogs.dart';
 import 'dart:developer' as devLog;
 import '../../api/apis.dart';
 import '../../main.dart';
@@ -32,12 +31,22 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _handleGoogleBtnClick() {
-    _signInWithGoogle().then((User) {
+    Dialogs.showProgressBar(context); //show progress bar
+    _signInWithGoogle().then((User) async {
+      Navigator.pop(context); //hiding progress bar
       if (User != null) {
         devLog.log('\nUser:  ${User.user}');
         devLog.log('\nUserAdditionalInfo:  ${User.additionalUserInfo}');
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+
+        if ((await APIs.userExists())) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+        } else {
+          await APIs.createUser().then((value) {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+          });
+        }
       }
     });
   }

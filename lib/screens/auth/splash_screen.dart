@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pbc/screens/auth/login_screen.dart';
-import 'package:pbc/screens/home_screen.dart';
+import 'package:PicBlockChain/screens/auth/login_screen.dart';
+import 'package:PicBlockChain/screens/home_screen.dart';
+import 'package:flutter/services.dart';
 import 'dart:developer' as devLog;
 import '../../api/apis.dart';
 import '../../main.dart';
@@ -16,7 +17,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(const Duration(seconds: 2), () {
+      //exit full screen
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+          systemNavigationBarColor: Colors.white,
+          statusBarColor: Colors.white));
       if (APIs.auth.currentUser != null) {
         devLog.log('\nUser:  ${APIs.auth.currentUser}');
 

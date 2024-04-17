@@ -1,4 +1,4 @@
-name: pbc
+name: PicBlockChain
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -43,6 +43,29 @@ dependencies:
   google_sign_in: ^6.2.1 #handling google.
 
   cloud_firestore: ^4.15.4 #conct cloud.
+
+  # for showing network image.
+  cached_network_image: ^3.3.1
+
+  # for picking images
+  image_picker: ^1.0.7
+
+  # for accessing Firebase Storage(for uploading files)
+  firebase_storage: ^11.6.5
+
+  #for showing emoji
+  emoji_picker_flutter: ^2.1.1 
+
+  #for accessing firebase messaging (push notification)
+  firebase_messaging: ^14.8.0
+
+  #for calling RestAPIs
+  http: 0.13.6
+
+  #for creating notification channel
+  flutter_notification_channel: ^3.1.0
+  #for storing image into gallery
+  gallery_saver: ^2.3.2
 
 dev_dependencies:
   flutter_test:

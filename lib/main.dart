@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pbc/screens/auth/splash_screen.dart';
-
+import 'package:PicBlockChain/screens/auth/splash_screen.dart';
+import 'dart:developer' as devLog;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_notification_channel/flutter_notification_channel.dart';
+import 'package:flutter_notification_channel/notification_importance.dart';
 import 'firebase_options.dart';
 
 // global obj
@@ -23,6 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'PicBlockChain',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
             appBarTheme: const AppBarTheme(
           centerTitle: true,
@@ -38,4 +41,11 @@ class MyApp extends StatelessWidget {
 
 _initializeFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  var result = await FlutterNotificationChannel().registerNotificationChannel(
+      description: 'For showing Message Notification',
+      id: 'chats',
+      importance: NotificationImportance.IMPORTANCE_HIGH,
+      name: 'Chats');
+  devLog.log('\nNotification Channel Result:$result');
 }

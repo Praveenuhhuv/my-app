@@ -1,16 +1,28 @@
+import 'package:PicBlockChain/api/apis.dart';
+import 'package:PicBlockChain/helper/my_date_until.dart';
+import 'package:PicBlockChain/models/message.dart';
+import 'package:PicBlockChain/widgets/dialogs/profile_dialog.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 //import 'package:pbc/main.dart';
 import '../main.dart';
+import '../models/chat_user.dart';
+import '../screens/Chat_Screen.dart';
 
 class ChatUserCard extends StatefulWidget {
-  const ChatUserCard({super.key});
+  final ChatUser user;
+
+  const ChatUserCard({super.key, required this.user});
 
   @override
   State<ChatUserCard> createState() => _ChatUserCardState();
 }
 
 class _ChatUserCardState extends State<ChatUserCard> {
+  //last msg info(if null --> no msg)
+  Message? _message;
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -19,19 +31,77 @@ class _ChatUserCardState extends State<ChatUserCard> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 0.5,
       child: InkWell(
-        onTap: () {},
-        child: const ListTile(
-          leading: CircleAvatar(
-              child: Icon(CupertinoIcons.person),
-              backgroundColor: Color.fromARGB(255, 5, 133, 238)),
-          title: Text('Demo User'),
-          subtitle: Text('Last user message', maxLines: 1),
-          trailing: Text(
-            '12:00  PM',
-            style: TextStyle(color: Colors.black54),
-          ),
-        ),
-      ),
+          onTap: () {
+            //for navigating to chat screen
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => ChatScreen(user: widget.user)));
+          },
+          child: StreamBuilder(
+            stream: APIs.getLastMessage(widget.user),
+            builder: (context, snapshot) {
+              final data = snapshot.data?.docs;
+              final list =
+                  data?.map((e) => Message.fromJson(e.data())).toList() ?? [];
+              if (list.isNotEmpty) _message = list[0];
+              return ListTile(
+                //user profile picture
+                //leading: const CircleAvatar(child: Icon(CupertinoIcons.person)),
+                leading: InkWell(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (_) => ProfileDialog(user: widget.user));
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(mq.height * .3),
+                    child: CachedNetworkImage(
+                      width: mq.height * .055,
+                      height: mq.height * .055,
+                      imageUrl: widget.user.image,
+                      //placeholder: (context, url) => CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => const CircleAvatar(
+                          child: Icon(CupertinoIcons.person)),
+                    ),
+                  ),
+                ),
+                //user name
+                title: Text(widget.user.name),
+
+                //last message
+                subtitle: Text(
+                    _message != null
+                        ? _message!.type == Type.image
+                            ? 'image'
+                            : _message!.msg
+                        : widget.user.about,
+                    maxLines: 1),
+
+                //last msg time
+                trailing: _message == null
+                    ? null //show nothing when no msg is sent
+                    : _message!.read.isEmpty &&
+                            _message!.fromId != APIs.user.uid
+                        ?
+                        // show for unread msg
+                        Container(
+                            width: 15,
+                            height: 15,
+                            decoration: BoxDecoration(
+                                color: Colors.greenAccent.shade400,
+                                borderRadius: BorderRadius.circular(10)),
+                          )
+                        :
+                        //msg sent time
+                        Text(
+                            MyDateUntil.getLastMessageTime(
+                                context: context, time: _message!.sent),
+                            style: const TextStyle(color: Colors.black54),
+                          ),
+              );
+            },
+          )),
     );
   }
 }
