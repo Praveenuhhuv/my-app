@@ -1,5 +1,4 @@
 import 'package:PicBlockChain/api/apis.dart';
-import 'package:PicBlockChain/helper/dialogs.dart';
 import 'package:PicBlockChain/helper/my_date_until.dart';
 import 'package:PicBlockChain/main.dart';
 import 'package:PicBlockChain/models/message.dart';
@@ -21,8 +20,12 @@ class MessageCard extends StatefulWidget {
 }
 
 class _MessageCardState extends State<MessageCard> {
+  late BuildContext scaffoldContext;
   @override
   Widget build(BuildContext context) {
+    // Store scaffold context when widget is built
+    scaffoldContext = context;
+    // Rest of your build method
     bool isMe = APIs.user.uid == widget.message.fromId;
     return InkWell(
         onLongPress: () {
@@ -195,7 +198,12 @@ class _MessageCardState extends State<MessageCard> {
                           //for hiding bottom sheet
                           Navigator.pop(context);
 
-                          Dialogs.showSnackbar(context, 'Text Copied');
+                          // Check if context is still valid before showing snackbar
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Text Copied')),
+                            );
+                          }
                         });
                       })
                   :
@@ -213,8 +221,14 @@ class _MessageCardState extends State<MessageCard> {
                             //for hiding bottom sheet
                             Navigator.pop(context);
                             if (success != null && success) {
-                              Dialogs.showSnackbar(
-                                  context, 'Image Successfully Saved!');
+                              // Check if context is still valid before showing snackbar
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text('Image Successfully stored')),
+                                );
+                              }
                             }
                           });
                         } catch (e) {
@@ -235,7 +249,12 @@ class _MessageCardState extends State<MessageCard> {
                 _OptionItem(
                     icon: const Icon(Icons.edit, color: Colors.blue, size: 26),
                     name: 'Edit Message',
-                    onTap: () {}),
+                    onTap: () {
+                      //for hiding bottom sheet
+                      Navigator.pop(context);
+
+                      _showMessageUpdateDialog();
+                    }),
 
               //delete option
               if (isMe)
@@ -274,6 +293,65 @@ class _MessageCardState extends State<MessageCard> {
             ],
           );
         });
+  }
+
+  //dialog for updating msg content
+  void _showMessageUpdateDialog() {
+    String updateMsg = widget.message.msg;
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              contentPadding: const EdgeInsets.only(
+                  left: 24, right: 24, top: 20, bottom: 20),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: const [
+                  Icon(
+                    Icons.message,
+                    color: Colors.blue,
+                    size: 28,
+                  ),
+                  Text('Update Message')
+                ],
+              ),
+
+              //content
+              content: TextFormField(
+                initialValue: updateMsg,
+                maxLines: null,
+                onChanged: (value) => updateMsg = value,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15))),
+              ),
+
+              //actions
+              actions: [
+                MaterialButton(
+                    //cancel button
+                    onPressed: () {
+                      //for hiding bottom sheet
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.blue, fontSize: 16),
+                    )),
+                //update button
+                MaterialButton(
+                    onPressed: () {
+                      //for hiding bottom sheet
+                      Navigator.pop(context);
+
+                      APIs.updateMessage(widget.message, updateMsg);
+                    },
+                    child: const Text(
+                      'Update',
+                      style: TextStyle(color: Colors.blue, fontSize: 16),
+                    ))
+              ],
+            ));
   }
 }
 

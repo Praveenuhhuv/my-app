@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:PicBlockChain/models/message.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/message.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'
+    show FirebaseFirestore, QuerySnapshot;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -86,6 +87,39 @@ class APIs {
     return (await firestore.collection('users').doc(user.uid).get()).exists;
   }
 
+  //for adding chatuser user for conversation
+  static Future<bool> addChatUser(String email) async {
+    final data = await firestore
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+
+    devLog.log('data: ${data.docs}');
+
+    if (data.docs.isNotEmpty) {
+      // Check if the user exists and is not the current user
+      if (data.docs.first.id != user.uid) {
+        devLog.log('User exists: ${data.docs.first.data()}');
+
+        // Add the user to the current user's list of chat users
+        await firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('my_users')
+            .doc(data.docs.first.id)
+            .set({});
+
+        return true; // User added successfully
+      } else {
+        devLog.log('Current user is the same as the found user.');
+        return false; // Current user is the same as the found user
+      }
+    } else {
+      devLog.log('User with email $email does not exist.');
+      return false; // User with the provided email does not exist
+    }
+  }
+
   //for checking if user exit or not
   static Future<void> getSelfInfo() async {
     await firestore.collection('users').doc(user.uid).get().then((user) async {
@@ -122,12 +156,41 @@ class APIs {
         .set(chatUser.toJson());
   }
 
-// get all users from firebase database
-  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers() {
+// get id's of known users from firebase database
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getMyUserId() {
     return firestore
         .collection('users')
-        .where('id', isNotEqualTo: user.uid)
+        .doc(user.uid)
+        .collection('my_users')
         .snapshots();
+  }
+
+// get all users from firebase database
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers(
+      List<String> userIds) {
+    if (userIds.isEmpty) {
+      // If userIds list is empty, return an empty stream
+      devLog.log('UserIds list is empty');
+      return Stream.empty();
+    } else {
+      // If userIds list is not empty, perform the Firestore query
+      devLog.log('\nUserIds : $userIds');
+      return firestore
+          .collection('users')
+          .where('id', whereIn: userIds)
+          .snapshots();
+    }
+  }
+
+  //for updating user information
+  static Future<void> sendFirstMessage(
+      ChatUser chatUser, String msg, Type type) async {
+    await firestore
+        .collection('users')
+        .doc(chatUser.id)
+        .collection('my_users')
+        .doc(user.uid)
+        .set({}).then((value) => sendMessage(chatUser, msg, type));
   }
 
 //for updating user information
@@ -264,5 +327,13 @@ class APIs {
     if (message.type == Type.image) {
       await storage.refFromURL(message.msg).delete();
     }
+  }
+
+  //update message
+  static Future<void> updateMessage(Message message, String updateMsg) async {
+    await firestore
+        .collection('chats/${getConversationID(message.toId)}/messages')
+        .doc(message.sent)
+        .update({'msg': updateMsg});
   }
 }

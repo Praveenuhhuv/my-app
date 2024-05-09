@@ -55,14 +55,16 @@ class _viewProfileScreenState extends State<viewProfileScreen> {
                 //user profile picture
                 ClipRRect(
                   borderRadius: BorderRadius.circular(mq.height * .1),
-                  child: CachedNetworkImage(
-                    width: mq.height * .2,
-                    height: mq.height * .2,
-                    fit: BoxFit.cover,
-                    imageUrl: widget.user.image,
-                    //placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const CircleAvatar(child: Icon(CupertinoIcons.person)),
+                  child: Flexible(
+                    child: CachedNetworkImage(
+                      width: mq.height * .2,
+                      height: mq.height * .2,
+                      fit: BoxFit.cover,
+                      imageUrl: widget.user.image,
+                      //placeholder: (context, url) => CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => const CircleAvatar(
+                          child: Icon(CupertinoIcons.person)),
+                    ),
                   ),
                 ),
 
@@ -79,16 +81,20 @@ class _viewProfileScreenState extends State<viewProfileScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'About:',
-                      style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15),
+                    Flexible(
+                      child: Text(
+                        'About:',
+                        style: TextStyle(
+                            color: Colors.black87,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15),
+                      ),
                     ),
-                    Text(widget.user.about,
-                        style: const TextStyle(
-                            color: Colors.black54, fontSize: 15)),
+                    Flexible(
+                      child: Text(widget.user.about,
+                          style: const TextStyle(
+                              color: Colors.black54, fontSize: 15)),
+                    ),
                   ],
                 ),
               ],

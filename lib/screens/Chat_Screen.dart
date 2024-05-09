@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:developer' as devLog;
 import 'package:PicBlockChain/helper/my_date_until.dart';
 import 'package:PicBlockChain/models/chat_user.dart';
+import 'package:PicBlockChain/screens/lock_screen.dart';
 import 'package:PicBlockChain/screens/view_profile_screen.dart';
 import 'package:PicBlockChain/widgets/message_card.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -296,6 +297,17 @@ class _ChatScreenState extends State<ChatScreen> {
                     icon: Icon(Icons.camera_alt_rounded,
                         color: Colors.blueAccent, size: 26),
                   ),
+                  // Lock icon for navigation to HomeScreen
+                  IconButton(
+                    onPressed: () {
+                      // Navigate to LockScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => LockScreen()),
+                      );
+                    },
+                    icon: Icon(Icons.lock, color: Colors.blueAccent, size: 26),
+                  ),
                 ],
               ),
             ),
@@ -305,7 +317,13 @@ class _ChatScreenState extends State<ChatScreen> {
           MaterialButton(
             onPressed: () {
               if (_textController.text.isNotEmpty) {
-                APIs.sendMessage(widget.user, _textController.text, Type.text);
+                if (_list.isEmpty) {
+                  APIs.sendFirstMessage(
+                      widget.user, _textController.text, Type.text);
+                } else {
+                  APIs.sendMessage(
+                      widget.user, _textController.text, Type.text);
+                }
                 _textController.text = '';
               }
             },

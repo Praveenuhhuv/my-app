@@ -6,15 +6,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_notification_channel/flutter_notification_channel.dart';
 import 'package:flutter_notification_channel/notification_importance.dart';
 import 'firebase_options.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:PicBlockChain/widgets/boxes.dart';
 
 // global obj
 late Size mq;
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.immersiveSticky); //full screnn
   _initializeFirebase();
+  await Hive.initFlutter(); // Initialize Hive
+  await Boxes.init(); // Initialize your boxes
   runApp(const MyApp());
 }
 
